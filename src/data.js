@@ -29,7 +29,7 @@ export const sampleProducts = [
     id: '4',
     name: 'Bia Tiger 330ml',
     price: 15000,
-    imageUrl: 'https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&w=800&q=80',
+    imageUrl: '/images/products/beers/tiger.jpg',
     category: 'do_uong',
     createdAt: '2026-01-01'
   },
@@ -37,7 +37,7 @@ export const sampleProducts = [
     id: '5',
     name: 'Bia Heineken 330ml',
     price: 18000,
-    imageUrl: 'https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&w=800&q=80',
+    imageUrl: '/images/products/beers/heineken.jpg',
     category: 'do_uong',
     createdAt: '2026-01-01'
   },
@@ -107,9 +107,9 @@ export const sampleProducts = [
   },
   {
     id: '14',
-    name: 'Bia Bia Việt 330ml',
+    name: 'Bia Hà Nội 330ml',
     price: 12000,
-    imageUrl: 'https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&w=800&q=80',
+    imageUrl: '/images/products/beers/bia-ha-noi.jpg',
     category: 'do_uong',
     createdAt: '2026-01-01'
   },
@@ -165,7 +165,7 @@ export const sampleProducts = [
     id: '21',
     name: 'Bia Sài Gòn 330ml',
     price: 13000,
-    imageUrl: 'https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&w=800&q=80',
+    imageUrl: '/images/products/beers/bia-saigon.jpg',
     category: 'do_uong',
     createdAt: '2026-01-01'
   },
@@ -407,25 +407,25 @@ export const sampleProducts = [
   // Bánh kẹo (25 sản phẩm)
   {
     id: '51',
-    name: 'Bánh Oreo 133g',
+    name: 'Oishi Snack Tôm Cay',
     price: 12000,
-    imageUrl: 'https://images.unsplash.com/photo-1586190848861-99aa4a171e90?auto=format&fit=crop&w=800&q=80',
+    imageUrl: '/images/products/candies/oishi-snack-tom-cay.png',
     category: 'banh_keo',
     createdAt: '2026-01-01'
   },
   {
     id: '52',
-    name: 'Kẹo dừa 200g',
+    name: 'Oishi Crab Me',
     price: 15000,
-    imageUrl: 'https://images.unsplash.com/photo-1586190848861-99aa4a171e90?auto=format&fit=crop&w=800&q=80',
+    imageUrl: '/images/products/candies/oishi-crab-me.png',
     category: 'banh_keo',
     createdAt: '2026-01-01'
   },
   {
     id: '53',
-    name: 'Bánh quy bơ 150g',
+    name: 'Oishi Snack Bí Đỏ',
     price: 18000,
-    imageUrl: 'https://images.unsplash.com/photo-1586190848861-99aa4a171e90?auto=format&fit=crop&w=800&q=80',
+    imageUrl: '/images/products/candies/oishi-snack-bi-do.png',
     category: 'banh_keo',
     createdAt: '2026-01-01'
   },
@@ -1007,6 +1007,55 @@ export const sampleProducts = [
     price: 65000,
     imageUrl: 'https://images.unsplash.com/photo-1584302179602-e4c3d3fd629d?auto=format&fit=crop&w=800&q=80',
     category: 'do_gia_dung',
+    createdAt: '2026-01-01'
+  },
+  // Bia bổ sung - local images
+  {
+    id: '126',
+    name: 'Bia 333 330ml',
+    price: 12000,
+    imageUrl: '/images/products/beers/bia-333.jpg',
+    category: 'do_uong',
+    createdAt: '2026-01-01'
+  },
+  {
+    id: '127',
+    name: 'Bia Larue 330ml',
+    price: 13000,
+    imageUrl: '/images/products/beers/larue.jpg',
+    category: 'do_uong',
+    createdAt: '2026-01-01'
+  },
+  {
+    id: '128',
+    name: 'Bia Huda 330ml',
+    price: 12000,
+    imageUrl: '/images/products/beers/huda.jpg',
+    category: 'do_uong',
+    createdAt: '2026-01-01'
+  },
+  {
+    id: '129',
+    name: 'Sapporo 330ml',
+    price: 22000,
+    imageUrl: '/images/products/beers/sapporo.jpg',
+    category: 'do_uong',
+    createdAt: '2026-01-01'
+  },
+  {
+    id: '130',
+    name: 'Budweiser 330ml',
+    price: 20000,
+    imageUrl: '/images/products/beers/budweiser.jpg',
+    category: 'do_uong',
+    createdAt: '2026-01-01'
+  },
+  {
+    id: '131',
+    name: 'Corona Extra 330ml',
+    price: 24000,
+    imageUrl: '/images/products/beers/corona.jpg',
+    category: 'do_uong',
     createdAt: '2026-01-01'
   }
 ];

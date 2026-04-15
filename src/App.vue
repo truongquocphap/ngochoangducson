@@ -1,43 +1,63 @@
 <template>
   <div class="min-h-screen bg-brandLight text-slate-900">
     <!-- Success/Error Message Display -->
-    <div v-if="showMessageFlag" class="fixed top-32 left-1/2 -translate-x-1/2 z-[9999] px-6 py-3 rounded-full shadow-2xl text-white font-medium border-2 border-white/20 backdrop-blur-sm" :class="message.type === 'success' ? 'bg-emerald-500' : 'bg-red-500'">
+    <div v-if="showMessageFlag" class="fixed left-1/2 top-24 z-[9999] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 px-4 py-3 text-center text-sm rounded-2xl sm:top-32 sm:px-6 sm:text-base sm:rounded-full shadow-2xl text-white font-medium border-2 border-white/20 backdrop-blur-sm" :class="message.type === 'success' ? 'bg-emerald-500' : 'bg-red-500'">
       {{ message.text }}
     </div>
 
     <div class="sticky top-0 z-50">
-      <div class="bg-brand text-white text-sm py-2 text-center">Chào mừng bạn đến với cửa hàng tạp hoá Ngọc Hoàng</div>
+      <div class="bg-brand py-1 text-center text-xs text-white sm:py-2 sm:text-sm">Chào mừng bạn đến với cửa hàng tạp hoá Ngọc Hoàng</div>
 
-      <header class="container mx-auto px-4 py-6 sm:px-6 bg-white">
-        <div class="grid gap-4 md:grid-cols-[1.5fr_2fr_1fr] items-center">
+      <header class="container mx-auto bg-white px-4 py-3 sm:px-6 sm:py-6">
+        <div class="grid items-center gap-2 sm:gap-4 lg:grid-cols-[1.3fr_2fr_1fr]">
           <div>
-            <h1 class="text-3xl font-bold text-brandDark">Tạp Hoá Ngọc Hoàng</h1>
-            <p class="mt-1 text-sm text-slate-600">Tạp hoá, thức uống, bia, nước ngọt, bàn chải, gia vị....</p>
+            <h1 class="text-xl font-bold text-brandDark sm:text-3xl">Tạp Hoá Ngọc Hoàng</h1>
+            <p class="mt-1 hidden text-sm text-slate-600 sm:block">Tạp hoá, thức uống, bia, nước ngọt, bàn chải, gia vị....</p>
           </div>
 
-          <div class="relative">
-            <input
-              v-model="searchKeyword"
-              type="search"
-              placeholder="Tìm sản phẩm..."
-              class="w-full rounded-full border border-slate-200 bg-white px-4 py-3 pr-12 text-sm shadow-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
-            />
-            <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+          <div class="flex items-center gap-2">
+            <div class="relative flex-1">
+              <input
+                v-model="searchKeyword"
+                type="search"
+                placeholder="Tìm sản phẩm..."
+                class="w-full rounded-full border border-slate-200 bg-white px-3 py-2.5 pr-10 text-sm shadow-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20 sm:px-4 sm:py-3 sm:pr-12"
+              />
+              <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+            </div>
+            <button
+              type="button"
+              @click="isMobileMenuOpen = !isMobileMenuOpen"
+              class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 md:hidden"
+              :aria-expanded="isMobileMenuOpen"
+              aria-label="Mo menu danh muc"
+            >
+              <span class="flex flex-col gap-1">
+                <span class="block h-0.5 w-4 bg-current"></span>
+                <span class="block h-0.5 w-4 bg-current"></span>
+                <span class="block h-0.5 w-4 bg-current"></span>
+              </span>
+            </button>
           </div>
 
-          <div class="flex items-center justify-end gap-4 text-sm">
-            <div class="rounded-3xl bg-white px-4 py-3 text-slate-700 shadow-sm">
+          <div class="flex flex-wrap items-center justify-between gap-2 text-sm sm:justify-end sm:gap-4">
+            <button
+              @click="showAddModal = true"
+              class="rounded-full bg-brand px-3 py-2 text-sm text-white shadow-sm transition hover:bg-brandDark sm:px-4 sm:py-3"
+            >
+              + Thêm sản phẩm
+            </button>
+            <div class="hidden rounded-3xl bg-white px-4 py-3 text-slate-700 shadow-sm sm:block">
               <div class="font-semibold">Hotline</div>
               <div>097 113 5767</div>
             </div>
-            <button class="rounded-full bg-white px-4 py-3 text-brandDark shadow-sm transition hover:bg-slate-100">Giỏ hàng</button>
           </div>
         </div>
       </header>
 
       <nav class="border-t border-b border-white/70 bg-white/80 shadow-sm">
-        <div class="container mx-auto px-4 py-3 sm:px-6">
-          <ul class="flex flex-wrap gap-3 text-sm font-medium text-slate-700">
+        <div class="container mx-auto px-4 py-2 sm:px-6 sm:py-3">
+          <ul class="hidden flex-wrap gap-3 text-sm font-medium text-slate-700 md:flex">
             <li>
               <button @click="selectCategory('all')" :class="navButtonClass('all')">Trang chủ</button>
             </li>
@@ -47,15 +67,36 @@
             <li><button @click="selectCategory('gia_vi')" :class="navButtonClass('gia_vi')">Gia vị</button></li>
             <li><button @click="selectCategory('do_gia_dung')" :class="navButtonClass('do_gia_dung')">Đồ gia dụng</button></li>
           </ul>
+
+          <ul v-if="isMobileMenuOpen" class="mt-3 grid gap-2 md:hidden">
+            <li>
+              <button @click="selectCategory('all')" :class="[...navButtonClass('all'), 'w-full text-left']">Trang chủ</button>
+            </li>
+            <li>
+              <button @click="selectCategory('do_uong')" :class="[...navButtonClass('do_uong'), 'w-full text-left']">Đồ uống</button>
+            </li>
+            <li>
+              <button @click="selectCategory('mi_goi')" :class="[...navButtonClass('mi_goi'), 'w-full text-left']">Mì - Đồ ăn liền</button>
+            </li>
+            <li>
+              <button @click="selectCategory('banh_keo')" :class="[...navButtonClass('banh_keo'), 'w-full text-left']">Bánh kẹo</button>
+            </li>
+            <li>
+              <button @click="selectCategory('gia_vi')" :class="[...navButtonClass('gia_vi'), 'w-full text-left']">Gia vị</button>
+            </li>
+            <li>
+              <button @click="selectCategory('do_gia_dung')" :class="[...navButtonClass('do_gia_dung'), 'w-full text-left']">Đồ gia dụng</button>
+            </li>
+          </ul>
         </div>
       </nav>
     </div>
 
-    <main class="container mx-auto px-4 py-8 sm:px-6">
+    <main class="container mx-auto px-4 py-6 sm:px-6 sm:py-8">
       <section class="grid gap-4">
-        <article class="rounded-3xl bg-brand text-white p-8 shadow-soft">
+        <article class="rounded-3xl bg-brand p-5 text-white shadow-soft sm:p-8">
           <p class="text-sm uppercase tracking-[0.3em] text-emerald-100">Ưu đãi đặc biệt</p>
-          <h2 class="mt-4 text-4xl font-bold">Mua sắm tạp hoá tiện lợi - giao tận nơi</h2>
+          <h2 class="mt-4 text-2xl font-bold sm:text-3xl lg:text-4xl">Mua sắm tạp hoá tiện lợi - giao tận nơi</h2>
           <p class="mt-4 max-w-xl text-base leading-7 text-emerald-100">Khuyến mãi hàng ngày, giá tốt toàn bộ danh mục. Đồ ăn nhanh, nước uống, gia vị, đồ dùng gia đình, đủ loại.</p>
           <div class="mt-6 flex flex-wrap gap-3">
             <span class="rounded-full bg-white/10 px-4 py-2">Miễn phí giao đơn 200k+</span>
@@ -64,26 +105,34 @@
         </article>
       </section>
 
-      <section class="mt-10 grid gap-4 sm:grid-cols-3">
-        <div class="rounded-3xl bg-white p-6 text-center shadow-sm">
-          <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brandLight text-brandDark text-xl">₫</div>
-          <h4 class="mt-4 font-semibold">Giá rẻ mỗi ngày</h4>
-          <p class="mt-2 text-sm text-slate-600">Giảm giá và ưu đãi liên tục.</p>
+      <section class="mt-10 rounded-3xl bg-white p-4 shadow-sm sm:p-6">
+        <div class="mb-4 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+          <div>
+            <p class="text-sm uppercase tracking-[0.3em] text-brandDark/70">Địa chỉ cửa hàng</p>
+            <h2 class="text-2xl font-bold sm:text-3xl">Bản đồ chỉ đường</h2>
+          </div>
+          <a
+            href="https://maps.app.goo.gl/EikVTb4jdbg6Kho28"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="rounded-full bg-brand px-4 py-2 text-sm font-medium text-white transition hover:bg-brandDark"
+          >
+            Mở Google Maps
+          </a>
         </div>
-        <div class="rounded-3xl bg-white p-6 text-center shadow-sm">
-          <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brandLight text-brandDark text-xl">✔</div>
-          <h4 class="mt-4 font-semibold">Hàng chính hãng</h4>
-          <p class="mt-2 text-sm text-slate-600">Đảm bảo chất lượng và nguồn gốc.</p>
-        </div>
-        <div class="rounded-3xl bg-white p-6 text-center shadow-sm">
-          <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brandLight text-brandDark text-xl">⚡</div>
-          <h4 class="mt-4 font-semibold">Giao nhanh</h4>
-          <p class="mt-2 text-sm text-slate-600">Nhiều khu vực hỗ trợ giao ngay.</p>
+        <div class="overflow-hidden rounded-3xl border border-slate-200">
+          <iframe
+            title="Bản đồ cửa hàng Ngọc Hoàng"
+            src="https://maps.google.com/maps?q=15.2081596,108.6600396&z=16&output=embed"
+            class="h-[130px] w-full sm:h-[170px]"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
         </div>
       </section>
 
       <section class="mt-10">
-        <div class="mb-6 flex items-center justify-between gap-4">
+        <div class="mb-6 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-4">
           <div>
             <p class="text-sm uppercase tracking-[0.3em] text-brandDark/70">Sản phẩm bán chạy</p>
             <h2 class="text-3xl font-bold">Ưa chuộng nhất</h2>
@@ -91,28 +140,30 @@
           <div class="text-sm text-slate-600">Có {{ filteredProducts.length }} sản phẩm phù hợp</div>
         </div>
 
-        <div class="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+        <div v-if="featuredProducts.length" class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
           <article
             v-for="product in featuredProducts"
             :key="product.id"
-            class="rounded-3xl bg-white p-3 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+            class="rounded-3xl bg-white p-2 sm:p-3 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
           >
-            <img :src="product.imageUrl" :alt="product.name" class="h-32 w-full rounded-3xl object-cover" />
+            <img :src="product.imageUrl" :alt="product.name" class="h-28 w-full rounded-3xl object-cover sm:h-36 lg:h-40" />
             <div class="mt-2">
-              <h3 class="text-base font-semibold text-slate-800">{{ product.name }}</h3>
-              <p class="mt-1 text-brandDark text-lg font-bold">{{ formatPrice(product.price) }}</p>
+              <h3 class="text-sm font-semibold text-slate-800 sm:text-base">{{ product.name }}</h3>
+              <p class="mt-1 text-base font-bold text-brandDark sm:text-lg">{{ formatPrice(product.price) }}</p>
             </div>
-            <button class="mt-2 w-full rounded-full bg-brand px-3 py-2 text-white transition hover:bg-brandDark">Thêm vào giỏ</button>
-            <div class="mt-2 flex gap-2">
-              <button @click="openEditModal(product)" class="flex-1 rounded-full border border-blue-200 bg-blue-50 px-3 py-2 text-blue-700 transition hover:bg-blue-100">Chỉnh sửa</button>
-              <button @click="openDeleteModal(product)" class="flex-1 rounded-full border border-red-200 bg-red-50 px-3 py-2 text-red-700 transition hover:bg-red-100">Xóa</button>
+            <div class="mt-2 flex flex-col gap-1.5 sm:flex-row sm:gap-2">
+              <button @click="openEditModal(product)" class="flex-1 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-sm text-blue-700 sm:px-3 sm:py-2 sm:text-base transition hover:bg-blue-100">Chỉnh sửa</button>
+              <button @click="openDeleteModal(product)" class="flex-1 rounded-full border border-red-200 bg-red-50 px-2.5 py-1.5 text-sm text-red-700 sm:px-3 sm:py-2 sm:text-base transition hover:bg-red-100">Xóa</button>
             </div>
           </article>
+        </div>
+        <div v-else class="rounded-3xl bg-white p-6 text-center text-slate-600 shadow-sm">
+          Không tìm thấy sản phẩm phù hợp với từ khóa tìm kiếm.
         </div>
       </section>
 
       <section id="category-do_uong" class="mt-10">
-        <div class="mb-6 flex items-center justify-between gap-4">
+        <div class="mb-6 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-4">
           <div>
             <p class="text-sm uppercase tracking-[0.3em] text-brandDark/70">Danh mục</p>
             <h2 class="text-3xl font-bold">Đồ uống</h2>
@@ -122,28 +173,27 @@
           </button>
         </div>
 
-        <div class="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
           <article
             v-for="product in sectionProducts('do_uong')"
             :key="product.id"
-            class="rounded-3xl bg-white p-3 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+            class="rounded-3xl bg-white p-2 sm:p-3 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
           >
-            <img :src="product.imageUrl" :alt="product.name" class="h-32 w-full rounded-3xl object-cover" />
+            <img :src="product.imageUrl" :alt="product.name" class="h-28 w-full rounded-3xl object-cover sm:h-36 lg:h-40" />
             <div class="mt-2">
-              <h3 class="text-base font-semibold text-slate-800">{{ product.name }}</h3>
-              <p class="mt-1 text-brandDark text-lg font-bold">{{ formatPrice(product.price) }}</p>
+              <h3 class="text-sm font-semibold text-slate-800 sm:text-base">{{ product.name }}</h3>
+              <p class="mt-1 text-base font-bold text-brandDark sm:text-lg">{{ formatPrice(product.price) }}</p>
             </div>
-            <button class="mt-2 w-full rounded-full bg-brand px-3 py-2 text-white transition hover:bg-brandDark">Thêm vào giỏ</button>
-            <div class="mt-2 flex gap-2">
-              <button @click="openEditModal(product)" class="flex-1 rounded-full border border-blue-200 bg-blue-50 px-3 py-2 text-blue-700 transition hover:bg-blue-100">Chỉnh sửa</button>
-              <button @click="openDeleteModal(product)" class="flex-1 rounded-full border border-red-200 bg-red-50 px-3 py-2 text-red-700 transition hover:bg-red-100">Xóa</button>
+            <div class="mt-2 flex flex-col gap-1.5 sm:flex-row sm:gap-2">
+              <button @click="openEditModal(product)" class="flex-1 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-sm text-blue-700 sm:px-3 sm:py-2 sm:text-base transition hover:bg-blue-100">Chỉnh sửa</button>
+              <button @click="openDeleteModal(product)" class="flex-1 rounded-full border border-red-200 bg-red-50 px-2.5 py-1.5 text-sm text-red-700 sm:px-3 sm:py-2 sm:text-base transition hover:bg-red-100">Xóa</button>
             </div>
           </article>
         </div>
       </section>
 
       <section id="category-mi_goi" class="mt-10">
-        <div class="mb-6 flex items-center justify-between gap-4">
+        <div class="mb-6 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-4">
           <div>
             <p class="text-sm uppercase tracking-[0.3em] text-brandDark/70">Danh mục</p>
             <h2 class="text-3xl font-bold">Mì ăn liền</h2>
@@ -153,28 +203,27 @@
           </button>
         </div>
 
-        <div class="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
           <article
             v-for="product in sectionProducts('mi_goi')"
             :key="product.id"
-            class="rounded-3xl bg-white p-3 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+            class="rounded-3xl bg-white p-2 sm:p-3 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
           >
-            <img :src="product.imageUrl" :alt="product.name" class="h-32 w-full rounded-3xl object-cover" />
+            <img :src="product.imageUrl" :alt="product.name" class="h-28 w-full rounded-3xl object-cover sm:h-36 lg:h-40" />
             <div class="mt-2">
-              <h3 class="text-base font-semibold text-slate-800">{{ product.name }}</h3>
-              <p class="mt-1 text-brandDark text-lg font-bold">{{ formatPrice(product.price) }}</p>
+              <h3 class="text-sm font-semibold text-slate-800 sm:text-base">{{ product.name }}</h3>
+              <p class="mt-1 text-base font-bold text-brandDark sm:text-lg">{{ formatPrice(product.price) }}</p>
             </div>
-            <button class="mt-2 w-full rounded-full bg-brand px-3 py-2 text-white transition hover:bg-brandDark">Thêm vào giỏ</button>
-            <div class="mt-2 flex gap-2">
-              <button @click="openEditModal(product)" class="flex-1 rounded-full border border-blue-200 bg-blue-50 px-3 py-2 text-blue-700 transition hover:bg-blue-100">Chỉnh sửa</button>
-              <button @click="openDeleteModal(product)" class="flex-1 rounded-full border border-red-200 bg-red-50 px-3 py-2 text-red-700 transition hover:bg-red-100">Xóa</button>
+            <div class="mt-2 flex flex-col gap-1.5 sm:flex-row sm:gap-2">
+              <button @click="openEditModal(product)" class="flex-1 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-sm text-blue-700 sm:px-3 sm:py-2 sm:text-base transition hover:bg-blue-100">Chỉnh sửa</button>
+              <button @click="openDeleteModal(product)" class="flex-1 rounded-full border border-red-200 bg-red-50 px-2.5 py-1.5 text-sm text-red-700 sm:px-3 sm:py-2 sm:text-base transition hover:bg-red-100">Xóa</button>
             </div>
           </article>
         </div>
       </section>
 
       <section id="category-banh_keo" class="mt-10">
-        <div class="mb-6 flex items-center justify-between gap-4">
+        <div class="mb-6 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-4">
           <div>
             <p class="text-sm uppercase tracking-[0.3em] text-brandDark/70">Danh mục</p>
             <h2 class="text-3xl font-bold">Bánh kẹo</h2>
@@ -184,28 +233,27 @@
           </button>
         </div>
 
-        <div class="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
           <article
             v-for="product in sectionProducts('banh_keo')"
             :key="product.id"
-            class="rounded-3xl bg-white p-3 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+            class="rounded-3xl bg-white p-2 sm:p-3 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
           >
-            <img :src="product.imageUrl" :alt="product.name" class="h-32 w-full rounded-3xl object-cover" />
+            <img :src="product.imageUrl" :alt="product.name" class="h-28 w-full rounded-3xl object-cover sm:h-36 lg:h-40" />
             <div class="mt-2">
-              <h3 class="text-base font-semibold text-slate-800">{{ product.name }}</h3>
-              <p class="mt-1 text-brandDark text-lg font-bold">{{ formatPrice(product.price) }}</p>
+              <h3 class="text-sm font-semibold text-slate-800 sm:text-base">{{ product.name }}</h3>
+              <p class="mt-1 text-base font-bold text-brandDark sm:text-lg">{{ formatPrice(product.price) }}</p>
             </div>
-            <button class="mt-2 w-full rounded-full bg-brand px-3 py-2 text-white transition hover:bg-brandDark">Thêm vào giỏ</button>
-            <div class="mt-2 flex gap-2">
-              <button @click="openEditModal(product)" class="flex-1 rounded-full border border-blue-200 bg-blue-50 px-3 py-2 text-blue-700 transition hover:bg-blue-100">Chỉnh sửa</button>
-              <button @click="openDeleteModal(product)" class="flex-1 rounded-full border border-red-200 bg-red-50 px-3 py-2 text-red-700 transition hover:bg-red-100">Xóa</button>
+            <div class="mt-2 flex flex-col gap-1.5 sm:flex-row sm:gap-2">
+              <button @click="openEditModal(product)" class="flex-1 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-sm text-blue-700 sm:px-3 sm:py-2 sm:text-base transition hover:bg-blue-100">Chỉnh sửa</button>
+              <button @click="openDeleteModal(product)" class="flex-1 rounded-full border border-red-200 bg-red-50 px-2.5 py-1.5 text-sm text-red-700 sm:px-3 sm:py-2 sm:text-base transition hover:bg-red-100">Xóa</button>
             </div>
           </article>
         </div>
       </section>
 
       <section id="category-gia_vi" class="mt-10">
-        <div class="mb-6 flex items-center justify-between gap-4">
+        <div class="mb-6 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-4">
           <div>
             <p class="text-sm uppercase tracking-[0.3em] text-brandDark/70">Danh mục</p>
             <h2 class="text-3xl font-bold">Gia vị</h2>
@@ -215,28 +263,27 @@
           </button>
         </div>
 
-        <div class="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
           <article
             v-for="product in sectionProducts('gia_vi')"
             :key="product.id"
-            class="rounded-3xl bg-white p-3 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+            class="rounded-3xl bg-white p-2 sm:p-3 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
           >
-            <img :src="product.imageUrl" :alt="product.name" class="h-32 w-full rounded-3xl object-cover" />
+            <img :src="product.imageUrl" :alt="product.name" class="h-28 w-full rounded-3xl object-cover sm:h-36 lg:h-40" />
             <div class="mt-2">
-              <h3 class="text-base font-semibold text-slate-800">{{ product.name }}</h3>
-              <p class="mt-1 text-brandDark text-lg font-bold">{{ formatPrice(product.price) }}</p>
+              <h3 class="text-sm font-semibold text-slate-800 sm:text-base">{{ product.name }}</h3>
+              <p class="mt-1 text-base font-bold text-brandDark sm:text-lg">{{ formatPrice(product.price) }}</p>
             </div>
-            <button class="mt-2 w-full rounded-full bg-brand px-3 py-2 text-white transition hover:bg-brandDark">Thêm vào giỏ</button>
-            <div class="mt-2 flex gap-2">
-              <button @click="openEditModal(product)" class="flex-1 rounded-full border border-blue-200 bg-blue-50 px-3 py-2 text-blue-700 transition hover:bg-blue-100">Chỉnh sửa</button>
-              <button @click="openDeleteModal(product)" class="flex-1 rounded-full border border-red-200 bg-red-50 px-3 py-2 text-red-700 transition hover:bg-red-100">Xóa</button>
+            <div class="mt-2 flex flex-col gap-1.5 sm:flex-row sm:gap-2">
+              <button @click="openEditModal(product)" class="flex-1 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-sm text-blue-700 sm:px-3 sm:py-2 sm:text-base transition hover:bg-blue-100">Chỉnh sửa</button>
+              <button @click="openDeleteModal(product)" class="flex-1 rounded-full border border-red-200 bg-red-50 px-2.5 py-1.5 text-sm text-red-700 sm:px-3 sm:py-2 sm:text-base transition hover:bg-red-100">Xóa</button>
             </div>
           </article>
         </div>
       </section>
 
       <section id="category-do_gia_dung" class="mt-10">
-        <div class="mb-6 flex items-center justify-between gap-4">
+        <div class="mb-6 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-4">
           <div>
             <p class="text-sm uppercase tracking-[0.3em] text-brandDark/70">Danh mục</p>
             <h2 class="text-3xl font-bold">Đồ gia dụng</h2>
@@ -246,37 +293,28 @@
           </button>
         </div>
 
-        <div class="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
           <article
             v-for="product in sectionProducts('do_gia_dung')"
             :key="product.id"
-            class="rounded-3xl bg-white p-3 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+            class="rounded-3xl bg-white p-2 sm:p-3 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
           >
-            <img :src="product.imageUrl" :alt="product.name" class="h-32 w-full rounded-3xl object-cover" />
+            <img :src="product.imageUrl" :alt="product.name" class="h-28 w-full rounded-3xl object-cover sm:h-36 lg:h-40" />
             <div class="mt-2">
-              <h3 class="text-base font-semibold text-slate-800">{{ product.name }}</h3>
-              <p class="mt-1 text-brandDark text-lg font-bold">{{ formatPrice(product.price) }}</p>
+              <h3 class="text-sm font-semibold text-slate-800 sm:text-base">{{ product.name }}</h3>
+              <p class="mt-1 text-base font-bold text-brandDark sm:text-lg">{{ formatPrice(product.price) }}</p>
             </div>
-            <button class="mt-2 w-full rounded-full bg-brand px-3 py-2 text-white transition hover:bg-brandDark">Thêm vào giỏ</button>
-            <div class="mt-2 flex gap-2">
-              <button @click="openEditModal(product)" class="flex-1 rounded-full border border-blue-200 bg-blue-50 px-3 py-2 text-blue-700 transition hover:bg-blue-100">Chỉnh sửa</button>
-              <button @click="openDeleteModal(product)" class="flex-1 rounded-full border border-red-200 bg-red-50 px-3 py-2 text-red-700 transition hover:bg-red-100">Xóa</button>
+            <div class="mt-2 flex flex-col gap-1.5 sm:flex-row sm:gap-2">
+              <button @click="openEditModal(product)" class="flex-1 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-sm text-blue-700 sm:px-3 sm:py-2 sm:text-base transition hover:bg-blue-100">Chỉnh sửa</button>
+              <button @click="openDeleteModal(product)" class="flex-1 rounded-full border border-red-200 bg-red-50 px-2.5 py-1.5 text-sm text-red-700 sm:px-3 sm:py-2 sm:text-base transition hover:bg-red-100">Xóa</button>
             </div>
           </article>
         </div>
       </section>
     </main>
 
-    <button
-      @click="showMessage('success', 'Test message thành công!')"
-      class="fixed bottom-6 left-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-green-500 text-white shadow-lg transition hover:bg-green-600"
-      aria-label="Test message"
-    >
-      ✓
-    </button>
-
-    <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
-      <div class="w-full max-w-2xl rounded-[2rem] bg-white p-6 shadow-2xl">
+    <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/50 p-3 sm:p-4">
+      <div class="w-full max-w-2xl rounded-[2rem] bg-white p-4 shadow-2xl sm:p-6">
         <div class="flex items-center justify-between gap-4">
           <div>
             <h2 class="text-2xl font-bold text-slate-900">Thêm sản phẩm</h2>
@@ -328,8 +366,8 @@
       </div>
     </div>
 
-    <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
-      <div class="w-full max-w-xl rounded-[2rem] bg-white p-6 shadow-2xl">
+    <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/50 p-3 sm:p-4">
+      <div class="w-full max-w-xl rounded-[2rem] bg-white p-4 shadow-2xl sm:p-6">
         <div class="flex items-center justify-between gap-4">
           <div>
             <h2 class="text-2xl font-bold text-slate-900">Xác nhận xóa</h2>
@@ -352,8 +390,8 @@
       </div>
     </div>
 
-    <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
-      <div class="w-full max-w-xl rounded-[2rem] bg-white p-6 shadow-2xl">
+    <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/50 p-3 sm:p-4">
+      <div class="w-full max-w-xl rounded-[2rem] bg-white p-4 shadow-2xl sm:p-6">
         <div class="flex items-center justify-between gap-4">
           <div>
             <h2 class="text-2xl font-bold text-slate-900">Chỉnh sửa sản phẩm</h2>
@@ -378,6 +416,20 @@
             <select v-model="editForm.category" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20">
               <option v-for="item in categoryOptions" :key="item.value" :value="item.value">{{ item.label }}</option>
             </select>
+          </label>
+
+          <label class="space-y-2">
+            <span class="text-sm font-medium text-slate-700">Ảnh từ máy</span>
+            <input
+              @change="handleEditFileChange"
+              type="file"
+              accept="image/*"
+              class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none file:mr-4 file:rounded-full file:border-0 file:bg-brand file:px-4 file:py-2 file:text-white"
+            />
+            <p class="text-xs text-slate-500">Chọn ảnh mới nếu bạn muốn cập nhật ảnh sản phẩm.</p>
+            <div v-if="editForm.previewUrl" class="mt-2 max-w-xs overflow-hidden rounded-3xl border border-slate-200">
+              <img :src="editForm.previewUrl" alt="Xem trước ảnh sản phẩm" class="h-28 w-full object-cover" />
+            </div>
           </label>
 
           <label class="space-y-2">
@@ -408,6 +460,8 @@ export default {
     };
 
     const STORAGE_KEY = 'taphoa_products_v2';
+    const DATA_VERSION = '3'; // tăng số này mỗi khi cập nhật data.js
+    const VERSION_KEY = 'taphoa_data_version';
     const ADMIN_KEY = getAdminKey();
 
     const defaultProducts = sampleProducts;
@@ -415,6 +469,7 @@ export default {
     const products = ref([]);
     const searchKeyword = ref('');
     const activeCategory = ref('all');
+    const isMobileMenuOpen = ref(false);
     const showAddModal = ref(false);
     const showDeleteModal = ref(false);
     const selectedDeleteProduct = ref(null);
@@ -427,6 +482,7 @@ export default {
       price: '',
       category: '',
       previewUrl: '',
+      file: null,
       adminKey: '',
       error: ''
     });
@@ -457,9 +513,11 @@ export default {
     ];
 
     const loadProducts = () => {
+      const storedVersion = localStorage.getItem(VERSION_KEY);
       const data = localStorage.getItem(STORAGE_KEY);
-      if (!data) {
+      if (!data || storedVersion !== DATA_VERSION) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultProducts));
+        localStorage.setItem(VERSION_KEY, DATA_VERSION);
         products.value = defaultProducts;
         return;
       }
@@ -468,6 +526,7 @@ export default {
       } catch (error) {
         products.value = defaultProducts;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultProducts));
+        localStorage.setItem(VERSION_KEY, DATA_VERSION);
       }
     };
 
@@ -494,32 +553,105 @@ export default {
       reader.readAsDataURL(file);
     };
 
+    const handleEditFileChange = (event) => {
+      const file = event.target.files?.[0] || null;
+      editForm.value.file = file;
+
+      if (!file) {
+        return;
+      }
+
+      if (!file.type.startsWith('image/')) {
+        editForm.value.error = 'Vui lòng chọn file ảnh.';
+        return;
+      }
+
+      editForm.value.error = '';
+      const reader = new FileReader();
+      reader.onload = () => {
+        editForm.value.previewUrl = reader.result;
+      };
+      reader.readAsDataURL(file);
+    };
+
     const formatPrice = (value) => {
       return value.toLocaleString('vi-VN') + ' đ';
     };
 
+    const normalizeText = (text = '') => {
+      return text
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .trim()
+        .replace(/\s+/g, ' ');
+    };
+
+    const levenshteinDistance = (a, b) => {
+      if (!a.length) return b.length;
+      if (!b.length) return a.length;
+
+      const matrix = Array.from({ length: a.length + 1 }, () => Array(b.length + 1).fill(0));
+
+      for (let i = 0; i <= a.length; i += 1) {
+        matrix[i][0] = i;
+      }
+      for (let j = 0; j <= b.length; j += 1) {
+        matrix[0][j] = j;
+      }
+
+      for (let i = 1; i <= a.length; i += 1) {
+        for (let j = 1; j <= b.length; j += 1) {
+          const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j - 1] + cost
+          );
+        }
+      }
+
+      return matrix[a.length][b.length];
+    };
+
+    const isRelativeNameMatch = (productName, keyword) => {
+      const normalizedKeyword = normalizeText(keyword);
+      if (!normalizedKeyword) {
+        return true;
+      }
+
+      const normalizedName = normalizeText(productName);
+      return normalizedName.includes(normalizedKeyword);
+    };
+
     const filteredProducts = computed(() => {
-      const keyword = searchKeyword.value.trim().toLowerCase();
+      const keyword = searchKeyword.value;
       let list = products.value;
       if (activeCategory.value !== 'all') {
         list = list.filter((item) => item.category === activeCategory.value);
       }
-      if (keyword) {
-        list = list.filter((item) => item.name.toLowerCase().includes(keyword));
+      if (keyword.trim()) {
+        list = list.filter((item) => isRelativeNameMatch(item.name, keyword));
       }
       return list;
     });
 
     const featuredProducts = computed(() => {
+      const keyword = searchKeyword.value.trim();
+      if (keyword) {
+        return filteredProducts.value;
+      }
+
       const sorted = [...products.value].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       return sorted.slice(0, 4);
     });
 
     const sectionProducts = (category) => {
-      const keyword = searchKeyword.value.trim().toLowerCase();
+      const keyword = searchKeyword.value;
       let list = products.value.filter((item) => item.category === category);
-      if (activeCategory.value === category && keyword) {
-        list = list.filter((item) => item.name.toLowerCase().includes(keyword));
+      if (activeCategory.value === category && keyword.trim()) {
+        list = list.filter((item) => isRelativeNameMatch(item.name, keyword));
       }
       return activeCategory.value === category ? list : list.slice(0, 4);
     };
@@ -530,7 +662,10 @@ export default {
 
     const selectCategory = (category) => {
       activeCategory.value = category;
-      if (category !== 'all') {
+      isMobileMenuOpen.value = false;
+      if (category === 'all') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
         setTimeout(() => {
           const element = document.getElementById(`category-${category}`);
           if (element) {
@@ -592,6 +727,7 @@ export default {
         price: product.price.toString(),
         category: product.category,
         previewUrl: product.imageUrl,
+        file: null,
         adminKey: '',
         error: ''
       };
@@ -606,6 +742,7 @@ export default {
         price: '',
         category: 'ban_chay',
         previewUrl: '',
+        file: null,
         adminKey: '',
         error: ''
       };
@@ -642,7 +779,7 @@ export default {
             name: editForm.value.name.trim(),
             price: Number(editForm.value.price),
             category: editForm.value.category,
-            imageUrl: editForm.value.previewUrl || item.imageUrl
+            imageUrl: editForm.value.previewUrl.trim() || item.imageUrl
           };
         }
         return item;
@@ -723,6 +860,7 @@ export default {
     return {
       searchKeyword,
       activeCategory,
+      isMobileMenuOpen,
       showAddModal,
       showDeleteModal,
       selectedDeleteProduct,
@@ -748,6 +886,7 @@ export default {
       handleEdit,
       handleSubmit,
       handleFileChange,
+      handleEditFileChange,
       closeModal,
       formatPrice,
       navButtonClass,
