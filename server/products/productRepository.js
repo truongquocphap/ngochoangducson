@@ -9,6 +9,15 @@ const HARDCODED_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3
 const HARDCODED_SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlraXNzeXh4bWdlbmp0ZmFqY3NiIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjM0MzE2MSwiZXhwIjoyMDkxOTE5MTYxfQ.tPWf0dMtMJYbkdUU_nr5slGExlJSxceQYooGvAe__EI';
 const HARDCODED_PRODUCTS_TABLE = 'products';
 
+// Parse JSON an toàn để fallback không làm hỏng toàn bộ request đọc catalog.
+function safeJsonParse(raw, fallbackValue) {
+  try {
+    return JSON.parse(raw);
+  } catch (error) {
+    return fallbackValue;
+  }
+}
+
 // Nạp dữ liệu seed local chỉ khi chưa có nguồn dữ liệu từ server.
 function loadSeedProducts() {
   const candidates = [
@@ -18,7 +27,10 @@ function loadSeedProducts() {
 
   for (const candidate of candidates) {
     if (fs.existsSync(candidate)) {
-      return JSON.parse(fs.readFileSync(candidate, 'utf8'));
+      const parsed = safeJsonParse(fs.readFileSync(candidate, 'utf8'), []);
+      if (Array.isArray(parsed)) {
+        return parsed;
+      }
     }
   }
 
@@ -87,7 +99,7 @@ async function readCatalogFromKv() {
     return [];
   }
 
-  const parsed = JSON.parse(payload.result);
+  const parsed = safeJsonParse(payload.result, []);
   return Array.isArray(parsed) ? parsed : [];
 }
 
