@@ -343,12 +343,32 @@
             </div>
           </label>
 
-          <label class="space-y-2">
+          <div class="space-y-2">
             <span class="text-sm font-medium text-slate-700">Danh mục</span>
-            <select v-model="form.category" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20">
-              <option v-for="item in categoryOptions" :key="item.value" :value="item.value">{{ item.label }}</option>
-            </select>
-          </label>
+            <div class="relative">
+              <button
+                type="button"
+                @click.stop="toggleAddCategoryMenu"
+                class="flex w-full items-center justify-between rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-left outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                :aria-expanded="isAddCategoryOpen"
+              >
+                <span>{{ getCategoryLabel(form.category) }}</span>
+                <span class="text-slate-400">▾</span>
+              </button>
+              <div v-if="isAddCategoryOpen" class="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-20 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
+                <button
+                  v-for="item in categoryOptions"
+                  :key="item.value"
+                  type="button"
+                  @click.stop="selectAddCategory(item.value)"
+                  class="block w-full px-4 py-3 text-left text-sm transition hover:bg-slate-100"
+                  :class="form.category === item.value ? 'bg-brandLight text-brandDark font-medium' : 'text-slate-700'"
+                >
+                  {{ item.label }}
+                </button>
+              </div>
+            </div>
+          </div>
 
           <label class="space-y-2">
             <span class="text-sm font-medium text-slate-700">Admin key</span>
@@ -411,12 +431,32 @@
             <input v-model="editForm.price" type="number" min="0" required class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20" />
           </label>
 
-          <label class="space-y-2">
+          <div class="space-y-2">
             <span class="text-sm font-medium text-slate-700">Danh mục</span>
-            <select v-model="editForm.category" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20">
-              <option v-for="item in categoryOptions" :key="item.value" :value="item.value">{{ item.label }}</option>
-            </select>
-          </label>
+            <div class="relative">
+              <button
+                type="button"
+                @click.stop="toggleEditCategoryMenu"
+                class="flex w-full items-center justify-between rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-left outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                :aria-expanded="isEditCategoryOpen"
+              >
+                <span>{{ getCategoryLabel(editForm.category) }}</span>
+                <span class="text-slate-400">▾</span>
+              </button>
+              <div v-if="isEditCategoryOpen" class="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-20 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
+                <button
+                  v-for="item in categoryOptions"
+                  :key="item.value"
+                  type="button"
+                  @click.stop="selectEditCategory(item.value)"
+                  class="block w-full px-4 py-3 text-left text-sm transition hover:bg-slate-100"
+                  :class="editForm.category === item.value ? 'bg-brandLight text-brandDark font-medium' : 'text-slate-700'"
+                >
+                  {{ item.label }}
+                </button>
+              </div>
+            </div>
+          </div>
 
           <label class="space-y-2">
             <span class="text-sm font-medium text-slate-700">Ảnh từ máy</span>
@@ -449,7 +489,7 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue';
-import { sampleProducts } from './data.js';
+import { createProduct, deleteProduct, fetchProducts, updateProduct } from './services/productsApi.js';
 
 export default {
   setup() {
@@ -461,16 +501,16 @@ export default {
 
     const STORAGE_KEY = 'taphoa_products_v2';
     const BACKUP_STORAGE_KEY = 'taphoa_products_backup_v1';
-    const DATA_VERSION = '3'; // tăng số này mỗi khi cập nhật data.js
-    const VERSION_KEY = 'taphoa_data_version';
     const ADMIN_KEY = getAdminKey();
 
-    const defaultProducts = sampleProducts;
+    const catalogMeta = ref({ storage: 'unknown' });
 
     const products = ref([]);
     const searchKeyword = ref('');
     const activeCategory = ref('all');
     const isMobileMenuOpen = ref(false);
+    const isAddCategoryOpen = ref(false);
+    const isEditCategoryOpen = ref(false);
     const showAddModal = ref(false);
     const showDeleteModal = ref(false);
     const selectedDeleteProduct = ref(null);
@@ -513,27 +553,43 @@ export default {
       { value: 'do_gia_dung', label: 'Đồ gia dụng' }
     ];
 
-    const loadProducts = () => {
-      const storedVersion = localStorage.getItem(VERSION_KEY);
-      const data = localStorage.getItem(STORAGE_KEY);
-      if (!data || storedVersion !== DATA_VERSION) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultProducts));
-        localStorage.setItem(VERSION_KEY, DATA_VERSION);
-        products.value = defaultProducts;
-        return;
-      }
-      try {
-        products.value = JSON.parse(data);
-      } catch (error) {
-        products.value = defaultProducts;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultProducts));
-        localStorage.setItem(VERSION_KEY, DATA_VERSION);
-      }
+    const loadProducts = async () => {
+      const result = await fetchProducts();
+      products.value = result.items;
+      catalogMeta.value = result.meta || { storage: 'unknown' };
     };
 
     const saveProducts = (updated) => {
       products.value = updated;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    };
+
+    const getCategoryLabel = (categoryValue) => {
+      return categoryOptions.find((item) => item.value === categoryValue)?.label || 'Chọn danh mục';
+    };
+
+    const toggleAddCategoryMenu = () => {
+      isAddCategoryOpen.value = !isAddCategoryOpen.value;
+      if (isAddCategoryOpen.value) {
+        isEditCategoryOpen.value = false;
+      }
+    };
+
+    const toggleEditCategoryMenu = () => {
+      isEditCategoryOpen.value = !isEditCategoryOpen.value;
+      if (isEditCategoryOpen.value) {
+        isAddCategoryOpen.value = false;
+      }
+    };
+
+    const selectAddCategory = (category) => {
+      form.value.category = category;
+      isAddCategoryOpen.value = false;
+    };
+
+    const selectEditCategory = (category) => {
+      editForm.value.category = category;
+      isEditCategoryOpen.value = false;
     };
 
     const loadBackupProducts = () => {
@@ -726,7 +782,11 @@ export default {
       }, 3000);
     };
 
-    const handleDelete = () => {
+    const showWritePendingMessage = (actionName) => {
+      showMessage('error', `${actionName} sẽ được bật sau khi xong API ghi dữ liệu.`);
+    };
+
+    const handleDelete = async () => {
       deleteError.value = '';
       if (deleteKey.value !== ADMIN_KEY) {
         deleteError.value = 'Admin key không đúng. Vui lòng thử lại.';
@@ -738,11 +798,19 @@ export default {
         showMessage('error', 'Xóa sản phẩm thất bại: Không tìm thấy sản phẩm!');
         return;
       }
-      const productName = selectedDeleteProduct.value.name;
-      const updatedProducts = products.value.filter((item) => item.id !== selectedDeleteProduct.value.id);
-      saveProducts(updatedProducts);
-      closeDeleteModal();
-      showMessage('success', `Đã xóa "${productName}" thành công!`);
+
+      try {
+        const deletedProduct = await deleteProduct({
+          id: selectedDeleteProduct.value.id,
+          adminKey: deleteKey.value
+        });
+        products.value = products.value.filter((item) => item.id !== deletedProduct.id);
+        closeDeleteModal();
+        showMessage('success', `Đã xóa "${deletedProduct.name}" thành công!`);
+      } catch (error) {
+        deleteError.value = error.message || 'Không thể xóa sản phẩm.';
+        showMessage('error', `Xóa sản phẩm thất bại: ${deleteError.value}`);
+      }
     };
 
     const openEditModal = (product) => {
@@ -761,6 +829,7 @@ export default {
 
     const closeEditModal = () => {
       showEditModal.value = false;
+      isEditCategoryOpen.value = false;
       selectedEditProduct.value = null;
       editForm.value = {
         name: '',
@@ -773,7 +842,7 @@ export default {
       };
     };
 
-    const handleEdit = () => {
+    const handleEdit = async () => {
       editForm.value.error = '';
       if (!editForm.value.name.trim()) {
         editForm.value.error = 'Tên sản phẩm không được để trống.';
@@ -796,26 +865,32 @@ export default {
         return;
       }
 
-      const productName = editForm.value.name;
-      const updatedProducts = products.value.map((item) => {
-        if (item.id === selectedEditProduct.value.id) {
-          return {
-            ...item,
-            name: editForm.value.name.trim(),
-            price: Number(editForm.value.price),
-            category: editForm.value.category,
-            imageUrl: editForm.value.previewUrl.trim() || item.imageUrl
-          };
-        }
-        return item;
-      });
+      try {
+        const updatedProduct = await updateProduct({
+          id: selectedEditProduct.value.id,
+          name: editForm.value.name.trim(),
+          price: Number(editForm.value.price),
+          category: editForm.value.category,
+          imageUrl: editForm.value.previewUrl.trim(),
+          adminKey: editForm.value.adminKey
+        });
 
-      saveProducts(updatedProducts);
-      closeEditModal();
-      showMessage('success', `Đã cập nhật "${productName}" thành công!`);
+        products.value = products.value.map((item) => {
+          if (item.id === updatedProduct.id) {
+            return updatedProduct;
+          }
+
+          return item;
+        });
+        closeEditModal();
+        showMessage('success', `Đã cập nhật "${updatedProduct.name}" thành công!`);
+      } catch (error) {
+        editForm.value.error = error.message || 'Không thể chỉnh sửa sản phẩm.';
+        showMessage('error', `Chỉnh sửa sản phẩm thất bại: ${editForm.value.error}`);
+      }
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
       form.value.error = '';
       if (!form.value.name.trim()) {
         form.value.error = 'Tên sản phẩm không được để trống.';
@@ -833,33 +908,36 @@ export default {
         return;
       }
 
-      const newProduct = {
-        id: Date.now().toString(),
-        name: form.value.name.trim(),
-        price: Number(form.value.price),
-        imageUrl: form.value.previewUrl || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80',
-        category: form.value.category,
-        createdAt: new Date().toISOString()
-      };
+      try {
+        const createdProduct = await createProduct({
+          name: form.value.name.trim(),
+          price: Number(form.value.price),
+          imageUrl: form.value.previewUrl,
+          category: form.value.category,
+          adminKey: form.value.adminKey
+        });
 
-      const productName = newProduct.name;
-      saveProducts([newProduct, ...products.value]);
-      saveToBackupStore(newProduct);
-      form.value = {
-        name: '',
-        price: '',
-        previewUrl: '',
-        file: null,
-        category: 'ban_chay',
-        adminKey: '',
-        error: ''
-      };
-      showAddModal.value = false;
-      showMessage('success', `Đã thêm "${productName}" thành công!`);
+        products.value = [createdProduct, ...products.value];
+        form.value = {
+          name: '',
+          price: '',
+          previewUrl: '',
+          file: null,
+          category: 'ban_chay',
+          adminKey: '',
+          error: ''
+        };
+        showAddModal.value = false;
+        showMessage('success', `Đã thêm "${createdProduct.name}" thành công!`);
+      } catch (error) {
+        form.value.error = error.message || 'Không thể thêm sản phẩm.';
+        showMessage('error', `Thêm sản phẩm thất bại: ${form.value.error}`);
+      }
     };
 
     const closeModal = () => {
       showAddModal.value = false;
+      isAddCategoryOpen.value = false;
       form.value.error = '';
     };
 
@@ -887,6 +965,8 @@ export default {
       searchKeyword,
       activeCategory,
       isMobileMenuOpen,
+      isAddCategoryOpen,
+      isEditCategoryOpen,
       showAddModal,
       showDeleteModal,
       selectedDeleteProduct,
@@ -899,6 +979,7 @@ export default {
       message,
       showMessageFlag,
       categoryOptions,
+      getCategoryLabel,
       filteredProducts,
       featuredProducts,
       sectionProducts,
@@ -907,6 +988,10 @@ export default {
       openDeleteModal,
       closeDeleteModal,
       handleDelete,
+      toggleAddCategoryMenu,
+      toggleEditCategoryMenu,
+      selectAddCategory,
+      selectEditCategory,
       openEditModal,
       closeEditModal,
       handleEdit,

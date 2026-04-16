@@ -1,10 +1,16 @@
 {
   "name": "grocery-store-ui-taphoah",
   "private": true,
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "dev": "vite",
+    "dev:vercel": "node --env-file=.env.local ./node_modules/vercel/dist/index.js dev --listen 127.0.0.1:3000",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "supabase:seed:products": "node --env-file=.env.local scripts/seedSupabaseProducts.mjs",
+    "supabase:check:products": "node --env-file=.env.local scripts/checkSupabaseProducts.mjs"
   },
   "dependencies": {
     "vue": "^3.2.47"
