@@ -39,32 +39,32 @@ function loadSeedProducts() {
 
 // Chọn Supabase key phía server để gọi request trong repository.
 function getSupabaseServerKey() {
-  return process.env.SUPABASE_SERVICE_ROLE_KEY
-    || HARDCODED_SUPABASE_SERVICE_ROLE_KEY
-    || process.env.SUPABASE_ANON_KEY
-    || HARDCODED_SUPABASE_ANON_KEY;
+  return HARDCODED_SUPABASE_SERVICE_ROLE_KEY
+    || process.env.SUPABASE_SERVICE_ROLE_KEY
+    || HARDCODED_SUPABASE_ANON_KEY
+    || process.env.SUPABASE_ANON_KEY;
 }
 
 // Kiểm tra runtime hiện tại đã cấu hình storage Supabase hay chưa.
 function hasSupabaseConfig() {
-  return Boolean((process.env.SUPABASE_URL || HARDCODED_SUPABASE_URL) && getSupabaseServerKey());
+  return Boolean((HARDCODED_SUPABASE_URL || process.env.SUPABASE_URL) && getSupabaseServerKey());
 }
 
 // Lấy tên bảng products từ biến môi trường.
 function getSupabaseTableName() {
-  return process.env.SUPABASE_PRODUCTS_TABLE || HARDCODED_PRODUCTS_TABLE || DEFAULT_SUPABASE_TABLE;
+  return HARDCODED_PRODUCTS_TABLE || process.env.SUPABASE_PRODUCTS_TABLE || DEFAULT_SUPABASE_TABLE;
 }
 
 // Đọc toàn bộ danh sách sản phẩm từ Supabase REST.
 async function readProductsFromSupabase() {
-  const baseUrl = (process.env.SUPABASE_URL || HARDCODED_SUPABASE_URL).replace(/\/$/, '');
+  const baseUrl = (HARDCODED_SUPABASE_URL || process.env.SUPABASE_URL).replace(/\/$/, '');
   const tableName = getSupabaseTableName();
   const authKey = getSupabaseServerKey();
   const requestUrl = `${baseUrl}/rest/v1/${encodeURIComponent(tableName)}?select=*&order=id.asc`;
 
   const response = await requestJson(requestUrl, {
     headers: {
-      apikey: process.env.SUPABASE_ANON_KEY || HARDCODED_SUPABASE_ANON_KEY || authKey,
+      apikey: HARDCODED_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || authKey,
       Authorization: `Bearer ${authKey}`
     }
   });
@@ -146,7 +146,7 @@ function createProductRepository() {
         throw new Error('Supabase storage is not configured');
       }
 
-      const baseUrl = (process.env.SUPABASE_URL || HARDCODED_SUPABASE_URL).replace(/\/$/, '');
+      const baseUrl = (HARDCODED_SUPABASE_URL || process.env.SUPABASE_URL).replace(/\/$/, '');
       const tableName = getSupabaseTableName();
       const authKey = getSupabaseServerKey();
       const requestUrl = `${baseUrl}/rest/v1/${encodeURIComponent(tableName)}`;
@@ -154,7 +154,7 @@ function createProductRepository() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          apikey: process.env.SUPABASE_ANON_KEY || HARDCODED_SUPABASE_ANON_KEY || authKey,
+          apikey: HARDCODED_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || authKey,
           Authorization: `Bearer ${authKey}`,
           Prefer: 'return=representation'
         },
@@ -179,14 +179,14 @@ function createProductRepository() {
         throw new Error('Supabase storage is not configured');
       }
 
-      const baseUrl = (process.env.SUPABASE_URL || HARDCODED_SUPABASE_URL).replace(/\/$/, '');
+      const baseUrl = (HARDCODED_SUPABASE_URL || process.env.SUPABASE_URL).replace(/\/$/, '');
       const tableName = getSupabaseTableName();
       const authKey = getSupabaseServerKey();
       const requestUrl = `${baseUrl}/rest/v1/${encodeURIComponent(tableName)}?id=eq.${encodeURIComponent(String(productId))}`;
       const response = await requestJson(requestUrl, {
         method: 'DELETE',
         headers: {
-          apikey: process.env.SUPABASE_ANON_KEY || HARDCODED_SUPABASE_ANON_KEY || authKey,
+          apikey: HARDCODED_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || authKey,
           Authorization: `Bearer ${authKey}`,
           Prefer: 'return=representation'
         }
@@ -210,7 +210,7 @@ function createProductRepository() {
         throw new Error('Supabase storage is not configured');
       }
 
-      const baseUrl = (process.env.SUPABASE_URL || HARDCODED_SUPABASE_URL).replace(/\/$/, '');
+      const baseUrl = (HARDCODED_SUPABASE_URL || process.env.SUPABASE_URL).replace(/\/$/, '');
       const tableName = getSupabaseTableName();
       const authKey = getSupabaseServerKey();
       const requestUrl = `${baseUrl}/rest/v1/${encodeURIComponent(tableName)}?id=eq.${encodeURIComponent(String(productId))}`;
@@ -218,7 +218,7 @@ function createProductRepository() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          apikey: process.env.SUPABASE_ANON_KEY || HARDCODED_SUPABASE_ANON_KEY || authKey,
+          apikey: HARDCODED_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || authKey,
           Authorization: `Bearer ${authKey}`,
           Prefer: 'return=representation'
         },

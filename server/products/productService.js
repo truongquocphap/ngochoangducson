@@ -25,7 +25,7 @@ function normalizeText(value = '') {
 
 // Lấy admin key từ biến môi trường hoặc dùng giá trị mặc định local.
 function getAdminKey() {
-  return process.env.ADMIN_KEY || HARDCODED_ADMIN_KEY || DEFAULT_ADMIN_KEY;
+  return HARDCODED_ADMIN_KEY || process.env.ADMIN_KEY || DEFAULT_ADMIN_KEY;
 }
 
 // Tạo lớp business logic để validate dữ liệu sản phẩm trước khi lưu.
