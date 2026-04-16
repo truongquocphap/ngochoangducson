@@ -553,21 +553,25 @@ export default {
       { value: 'do_gia_dung', label: 'Đồ gia dụng' }
     ];
 
+    // Tải danh sách sản phẩm hiện tại từ backend và lưu metadata đi kèm.
     const loadProducts = async () => {
       const result = await fetchProducts();
       products.value = result.items;
       catalogMeta.value = result.meta || { storage: 'unknown' };
     };
 
+    // Đồng bộ danh sách trên UI khi API ghi dữ liệu đã trả về kết quả mới.
     const saveProducts = (updated) => {
       products.value = updated;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     };
 
+    // Chuyển giá trị category sang label hiển thị.
     const getCategoryLabel = (categoryValue) => {
       return categoryOptions.find((item) => item.value === categoryValue)?.label || 'Chọn danh mục';
     };
 
+    // Mở hoặc đóng dropdown chọn danh mục của form thêm sản phẩm.
     const toggleAddCategoryMenu = () => {
       isAddCategoryOpen.value = !isAddCategoryOpen.value;
       if (isAddCategoryOpen.value) {
@@ -575,6 +579,7 @@ export default {
       }
     };
 
+    // Mở hoặc đóng dropdown chọn danh mục của form chỉnh sửa.
     const toggleEditCategoryMenu = () => {
       isEditCategoryOpen.value = !isEditCategoryOpen.value;
       if (isEditCategoryOpen.value) {
@@ -582,16 +587,19 @@ export default {
       }
     };
 
+    // Gán danh mục được chọn vào form thêm sản phẩm.
     const selectAddCategory = (category) => {
       form.value.category = category;
       isAddCategoryOpen.value = false;
     };
 
+    // Gán danh mục được chọn vào form chỉnh sửa sản phẩm.
     const selectEditCategory = (category) => {
       editForm.value.category = category;
       isEditCategoryOpen.value = false;
     };
 
+    // Đọc danh sách backup local được dùng từ giai đoạn trước khi có backend write.
     const loadBackupProducts = () => {
       const raw = localStorage.getItem(BACKUP_STORAGE_KEY);
       if (!raw) {
@@ -606,6 +614,7 @@ export default {
       }
     };
 
+    // Thêm sản phẩm vào backup local cũ nếu chưa tồn tại.
     const saveToBackupStore = (product) => {
       const backupProducts = loadBackupProducts();
       const existed = backupProducts.some((item) => item.id === product.id);
@@ -616,6 +625,7 @@ export default {
       localStorage.setItem(BACKUP_STORAGE_KEY, JSON.stringify([product, ...backupProducts]));
     };
 
+    // Đọc file ảnh từ form thêm và tạo preview URL.
     const handleFileChange = (event) => {
       const file = event.target.files?.[0] || null;
       form.value.file = file;
@@ -634,6 +644,7 @@ export default {
       reader.readAsDataURL(file);
     };
 
+    // Đọc file ảnh từ form sửa và tạo preview URL.
     const handleEditFileChange = (event) => {
       const file = event.target.files?.[0] || null;
       editForm.value.file = file;
@@ -655,10 +666,12 @@ export default {
       reader.readAsDataURL(file);
     };
 
+    // Format giá sản phẩm theo kiểu tiền tệ Việt Nam.
     const formatPrice = (value) => {
       return value.toLocaleString('vi-VN') + ' đ';
     };
 
+    // Chuẩn hóa text để tìm kiếm phía client không bị ảnh hưởng bởi dấu.
     const normalizeText = (text = '') => {
       return text
         .toLowerCase()
@@ -669,6 +682,7 @@ export default {
         .replace(/\s+/g, ' ');
     };
 
+    // Tính khoảng cách chỉnh sửa giữa hai chuỗi.
     const levenshteinDistance = (a, b) => {
       if (!a.length) return b.length;
       if (!b.length) return a.length;
@@ -696,6 +710,7 @@ export default {
       return matrix[a.length][b.length];
     };
 
+    // Kiểm tra tên sản phẩm có khớp với từ khóa tìm kiếm hiện tại hay không.
     const isRelativeNameMatch = (productName, keyword) => {
       const normalizedKeyword = normalizeText(keyword);
       if (!normalizedKeyword) {
@@ -706,6 +721,7 @@ export default {
       return normalizedName.includes(normalizedKeyword);
     };
 
+    // Tạo danh sách sản phẩm đang hiển thị dựa trên bộ lọc hiện tại.
     const filteredProducts = computed(() => {
       const keyword = searchKeyword.value;
       let list = products.value;
@@ -718,6 +734,7 @@ export default {
       return list;
     });
 
+    // Chọn các sản phẩm sẽ hiển thị ở khu vực nổi bật.
     const featuredProducts = computed(() => {
       const keyword = searchKeyword.value.trim();
       if (keyword) {
@@ -728,6 +745,7 @@ export default {
       return sorted.slice(0, 4);
     });
 
+    // Trả về danh sách sản phẩm hiển thị trong từng section danh mục.
     const sectionProducts = (category) => {
       const keyword = searchKeyword.value;
       let list = products.value.filter((item) => item.category === category);
@@ -737,10 +755,12 @@ export default {
       return activeCategory.value === category ? list : list.slice(0, 4);
     };
 
+    // Bật hoặc tắt bộ lọc theo danh mục.
     const toggleCategory = (category) => {
       activeCategory.value = activeCategory.value === category ? 'all' : category;
     };
 
+    // Kích hoạt danh mục và cuộn đến section tương ứng khi cần.
     const selectCategory = (category) => {
       activeCategory.value = category;
       isMobileMenuOpen.value = false;
@@ -756,6 +776,7 @@ export default {
       }
     };
 
+    // Mở modal xác nhận xóa cho một sản phẩm cụ thể.
     const openDeleteModal = (product) => {
       selectedDeleteProduct.value = product;
       deleteKey.value = '';
@@ -763,6 +784,7 @@ export default {
       showDeleteModal.value = true;
     };
 
+    // Đóng modal xác nhận xóa và reset state liên quan.
     const closeDeleteModal = () => {
       showDeleteModal.value = false;
       selectedDeleteProduct.value = null;
@@ -770,6 +792,7 @@ export default {
       deleteError.value = '';
     };
 
+    // Hiển thị thông báo thành công hoặc lỗi trong thời gian ngắn.
     const showMessage = (type, text) => {
       message.value = { type, text };
       showMessageFlag.value = true;
@@ -782,10 +805,12 @@ export default {
       }, 3000);
     };
 
+    // Hiển thị thông báo tạm cho các luồng ghi dữ liệu chưa bật.
     const showWritePendingMessage = (actionName) => {
       showMessage('error', `${actionName} sẽ được bật sau khi xong API ghi dữ liệu.`);
     };
 
+    // Xóa sản phẩm đang chọn thông qua backend API.
     const handleDelete = async () => {
       deleteError.value = '';
       if (deleteKey.value !== ADMIN_KEY) {
@@ -813,6 +838,7 @@ export default {
       }
     };
 
+    // Mở modal chỉnh sửa và điền sẵn dữ liệu sản phẩm vào form.
     const openEditModal = (product) => {
       selectedEditProduct.value = product;
       editForm.value = {
@@ -827,6 +853,7 @@ export default {
       showEditModal.value = true;
     };
 
+    // Đóng modal chỉnh sửa và reset state của form sửa.
     const closeEditModal = () => {
       showEditModal.value = false;
       isEditCategoryOpen.value = false;
@@ -842,6 +869,7 @@ export default {
       };
     };
 
+    // Cập nhật sản phẩm đang chọn thông qua backend API.
     const handleEdit = async () => {
       editForm.value.error = '';
       if (!editForm.value.name.trim()) {
@@ -890,6 +918,7 @@ export default {
       }
     };
 
+    // Tạo sản phẩm mới thông qua backend API.
     const handleSubmit = async () => {
       form.value.error = '';
       if (!form.value.name.trim()) {
@@ -935,12 +964,14 @@ export default {
       }
     };
 
+    // Đóng modal thêm sản phẩm và xóa lỗi tạm trên form.
     const closeModal = () => {
       showAddModal.value = false;
       isAddCategoryOpen.value = false;
       form.value.error = '';
     };
 
+    // Trả về class cho nút điều hướng theo trạng thái danh mục hiện tại.
     const navButtonClass = (category) => {
       return [
         'rounded-full px-4 py-2 transition',
@@ -950,6 +981,7 @@ export default {
 
     onMounted(loadProducts);
 
+    // Chuyển id danh mục sang tiêu đề hiển thị trên giao diện.
     const getCategoryName = (category) => {
       const categoryMap = {
         'do_uong': 'Đồ uống',

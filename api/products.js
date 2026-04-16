@@ -3,6 +3,7 @@ const { readJsonBody } = require('../server/shared/readRequestBody');
 
 const productsService = createProductsService();
 
+// Xử lý các request CRUD sản phẩm cho serverless route khi deploy.
 module.exports = async (req, res) => {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
 

@@ -1,6 +1,7 @@
 const http = require('http');
 const https = require('https');
 
+// Thực hiện HTTP request thô và trả về response dưới dạng text.
 function requestText(url, { method = 'GET', headers = {}, body } = {}) {
   return new Promise((resolve, reject) => {
     const target = new URL(url);
@@ -39,11 +40,22 @@ function requestText(url, { method = 'GET', headers = {}, body } = {}) {
   });
 }
 
+// Thực hiện HTTP request và parse response body thành JSON.
 async function requestJson(url, options) {
   const response = await requestText(url, options);
+  let json = null;
+
+  if (response.body) {
+    try {
+      json = JSON.parse(response.body);
+    } catch (error) {
+      json = null;
+    }
+  }
+
   return {
     ...response,
-    json: response.body ? JSON.parse(response.body) : null
+    json
   };
 }
 

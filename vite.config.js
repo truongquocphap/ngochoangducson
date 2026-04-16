@@ -3,6 +3,7 @@ const vue = require('@vitejs/plugin-vue');
 const { createProductsService } = require('./server/products/productService');
 const { readJsonBody } = require('./server/shared/readRequestBody');
 
+// Gắn products API vào Vite dev server để local dev chạy giống backend runtime.
 function localProductsApiPlugin() {
   return {
     name: 'local-products-api',
@@ -60,6 +61,7 @@ function localProductsApiPlugin() {
   };
 }
 
+// Nạp biến môi trường vào local Node process và đăng ký plugin Vue cùng local API.
 module.exports = defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   Object.assign(process.env, env);

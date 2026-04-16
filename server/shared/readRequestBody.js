@@ -1,3 +1,4 @@
+// Đọc toàn bộ request stream thành chuỗi UTF-8.
 function readRequestBody(req) {
   return new Promise((resolve, reject) => {
     let raw = '';
@@ -13,6 +14,7 @@ function readRequestBody(req) {
   });
 }
 
+// Parse request body thành JSON để dùng trong API handler.
 async function readJsonBody(req) {
   const raw = await readRequestBody(req);
   if (!raw) {

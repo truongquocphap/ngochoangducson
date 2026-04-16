@@ -10,7 +10,9 @@ const VALID_CATEGORIES = new Set([
 ]);
 const DEFAULT_PRODUCT_IMAGE = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80';
 const DEFAULT_ADMIN_KEY = '123456';
+const HARDCODED_ADMIN_KEY = '123456';
 
+// Chuẩn hóa tiếng Việt để tìm kiếm không bị ảnh hưởng bởi dấu.
 function normalizeText(value = '') {
   return value
     .toLowerCase()
@@ -21,12 +23,15 @@ function normalizeText(value = '') {
     .replace(/\s+/g, ' ');
 }
 
+// Lấy admin key từ biến môi trường hoặc dùng giá trị mặc định local.
 function getAdminKey() {
-  return process.env.ADMIN_KEY || DEFAULT_ADMIN_KEY;
+  return process.env.ADMIN_KEY || HARDCODED_ADMIN_KEY || DEFAULT_ADMIN_KEY;
 }
 
+// Tạo lớp business logic để validate dữ liệu sản phẩm trước khi lưu.
 function createProductsService({ repository = createProductRepository() } = {}) {
   return {
+    // Trả về danh sách sản phẩm sau khi áp dụng lọc theo danh mục và từ khóa.
     async listProducts({ search = '', category = '' } = {}) {
       const result = await repository.listProducts();
       const normalizedSearch = normalizeText(search);
@@ -65,6 +70,7 @@ function createProductsService({ repository = createProductRepository() } = {}) 
       };
     },
 
+    // Validate và tạo mới một bản ghi sản phẩm.
     async createProduct(input = {}) {
       const name = typeof input.name === 'string' ? input.name.trim() : '';
       const price = Number(input.price);
@@ -105,6 +111,7 @@ function createProductsService({ repository = createProductRepository() } = {}) 
       };
     },
 
+    // Validate request xóa trước khi xóa sản phẩm.
     async deleteProduct(input = {}) {
       const productId = input.id;
       const adminKey = typeof input.adminKey === 'string' ? input.adminKey : '';
@@ -130,6 +137,7 @@ function createProductsService({ repository = createProductRepository() } = {}) 
       };
     },
 
+    // Validate và cập nhật một bản ghi sản phẩm hiện có.
     async updateProduct(input = {}) {
       const productId = input.id;
       const name = typeof input.name === 'string' ? input.name.trim() : '';

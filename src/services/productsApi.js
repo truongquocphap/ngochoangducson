@@ -1,7 +1,9 @@
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabaseProductsTable = import.meta.env.VITE_SUPABASE_PRODUCTS_TABLE || 'products';
+const canUseDirectSupabaseFallback = import.meta.env.DEV && Boolean(supabaseUrl && supabaseAnonKey);
 
+// Đọc sản phẩm trực tiếp từ Supabase khi runtime API local không khả dụng.
 async function fetchProductsFromSupabase() {
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error('Missing Vite Supabase env for direct fallback');
@@ -32,6 +34,7 @@ async function fetchProductsFromSupabase() {
   };
 }
 
+// Tải danh sách sản phẩm qua backend API và fallback sang Supabase trực tiếp khi chạy local.
 export async function fetchProducts() {
   try {
     const response = await fetch('/api/products');
@@ -49,6 +52,17 @@ export async function fetchProducts() {
       meta: payload.meta || { storage: 'api' }
     };
   } catch (error) {
+    if (!canUseDirectSupabaseFallback) {
+      console.error('Khong the tai san pham tu /api/products.', error);
+      return {
+        items: [],
+        meta: {
+          storage: 'api-unavailable',
+          error: error.message
+        }
+      };
+    }
+
     console.warn('Failed to load products from /api/products. Falling back to Supabase direct read.', error);
 
     try {
@@ -66,6 +80,7 @@ export async function fetchProducts() {
   }
 }
 
+// Tạo sản phẩm mới thông qua backend API.
 export async function createProduct(productInput) {
   const response = await fetch('/api/products', {
     method: 'POST',
@@ -83,6 +98,7 @@ export async function createProduct(productInput) {
   return payload.data;
 }
 
+// Xóa sản phẩm thông qua backend API.
 export async function deleteProduct(productInput) {
   const response = await fetch('/api/products', {
     method: 'DELETE',
@@ -100,6 +116,7 @@ export async function deleteProduct(productInput) {
   return payload.data;
 }
 
+// Cập nhật sản phẩm hiện có thông qua backend API.
 export async function updateProduct(productInput) {
   const response = await fetch('/api/products', {
     method: 'PATCH',
