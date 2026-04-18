@@ -142,7 +142,7 @@
            Có nút ‹ › để chuyển tay và chấm dot-indicator bên dưới. -->
       <section class="grid gap-4">
         <article class="relative overflow-hidden rounded-3xl bg-brand text-white shadow-soft">
-          <div class="relative h-[260px] sm:h-[320px] lg:h-[380px]">
+          <div class="relative h-[210px] sm:h-[320px] lg:h-[380px]">
             <!-- Từng slide: chỉ slide có index === currentPromoSlide mới hiện (opacity-100) -->
             <div
               v-for="(slide, index) in promoSlides"
@@ -154,38 +154,19 @@
               <!-- Lớp phủ gradient từ trái (tối) sang phải (trong suốt) giúp chữ dễ đọc trên ảnh -->
               <div class="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-900/55 to-slate-900/20"></div>
               <!-- Vùng nội dung văn bản của slide: eyebrow, title, description, tags -->
-              <div class="absolute inset-0 flex flex-col justify-end p-5 sm:p-8">
+              <div class="absolute inset-0 flex flex-col justify-end p-2.5 sm:p-8">
                 <!-- Nhãn nhỏ phía trên tiêu đề (ví dụ: "Đặc sản miền Trung") -->
-                <p class="text-sm uppercase tracking-[0.3em] text-emerald-100">{{ slide.eyebrow }}</p>
+                <p class="text-xs uppercase tracking-[0.14em] text-emerald-100 sm:text-sm sm:tracking-[0.3em]">{{ slide.eyebrow }}</p>
                 <!-- Tiêu đề chính của slide -->
-                <h2 class="mt-4 max-w-2xl text-2xl font-bold sm:text-3xl lg:text-4xl">{{ slide.title }}</h2>
+                <h2 class="mt-1.5 max-w-2xl text-[18px] font-bold leading-tight sm:mt-4 sm:text-3xl lg:text-4xl">{{ slide.title }}</h2>
                 <!-- Mô tả ngắn bên dưới tiêu đề -->
-                <p class="mt-4 max-w-xl text-sm leading-6 text-emerald-50 sm:text-base sm:leading-7">{{ slide.description }}</p>
+                <p class="mt-1 max-w-xl text-[13px] leading-4 text-emerald-50 sm:mt-4 sm:text-base sm:leading-7">{{ slide.description }}</p>
                 <!-- Danh sách tag nổi bật cuối slide -->
-                <div class="mt-6 flex flex-wrap gap-3">
-                  <span v-for="tag in slide.tags" :key="tag" class="rounded-full bg-white/15 px-4 py-2 backdrop-blur-sm">{{ tag }}</span>
+                <div class="mt-1.5 flex flex-wrap gap-1 sm:mt-6 sm:gap-3">
+                  <span v-for="tag in slide.tags" :key="tag" class="rounded-full bg-white/15 px-2 py-0.5 text-[10px] leading-none backdrop-blur-sm sm:px-4 sm:py-2 sm:text-base">{{ tag }}</span>
                 </div>
               </div>
             </div>
-
-            <!-- Nút chuyển về slide trước (‹), nằm bên trái giữa -->
-            <button
-              type="button"
-              @click="showPreviousPromoSlide"
-              class="absolute left-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-lg text-white backdrop-blur-sm transition hover:bg-white/30"
-              aria-label="Xem slide trước"
-            >
-              ‹
-            </button>
-            <!-- Nút chuyển sang slide tiếp theo (›), nằm bên phải giữa -->
-            <button
-              type="button"
-              @click="showNextPromoSlide"
-              class="absolute right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-lg text-white backdrop-blur-sm transition hover:bg-white/30"
-              aria-label="Xem slide tiếp theo"
-            >
-              ›
-            </button>
 
             <!-- Dot indicator: mỗi chấm đại diện một slide.
                  Chấm đang active rộng hơn (w-8), chấm còn lại nhỏ (w-2.5). -->
