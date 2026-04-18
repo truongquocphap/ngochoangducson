@@ -1,7 +1,20 @@
+/**
+ * ============================================================
+ * TIỆN ÍCH GỌI HTTP REQUEST
+ * ============================================================
+ * Node.js không có built-in fetch như trình duyệt.
+ * File này wrap Node.js http/https module thành 2 hàm tiện ích:
+ *   - requestText: gọi HTTP và trả về response dạng text
+ *   - requestJson: gọi HTTP và parse response thành JSON
+ * Dùng chủ yếu để gọi Supabase REST API từ phía server.
+ * ============================================================
+ */
 const http = require('http');
 const https = require('https');
 
 // Thực hiện HTTP request thô và trả về response dưới dạng text.
+// Tự động chọn http hoặc https dựa vào protocol của URL.
+// Trả về { statusCode, headers, body: string }
 function requestText(url, { method = 'GET', headers = {}, body } = {}) {
   return new Promise((resolve, reject) => {
     const target = new URL(url);
@@ -41,6 +54,8 @@ function requestText(url, { method = 'GET', headers = {}, body } = {}) {
 }
 
 // Thực hiện HTTP request và parse response body thành JSON.
+// Trả về { statusCode, headers, body: string, json: object|null }
+// json = null nếu response body không phải JSON hợp lệ.
 async function requestJson(url, options) {
   const response = await requestText(url, options);
   let json = null;

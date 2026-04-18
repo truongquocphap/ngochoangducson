@@ -1,11 +1,29 @@
+/**
+ * ============================================================
+ * PRODUCT REPOSITORY - Lớp truy cập dữ liệu (Data Access Layer)
+ * ============================================================
+ * Chịu trách nhiệm đọc/ghi sản phẩm với các nguồn lưu trữ.
+ * Thứ tự ưu tiên:
+ *   1. Supabase (cơ sở dữ liệu chính - PostgreSQL)
+ *   2. KV Store (fallback cũ, không còn dùng chính)
+ *   3. Seed file local (data/products1.json) - chỉ khi không có DB
+ *
+ * Tách biệt hoàn toàn với business logic (xem productService.js).
+ * ============================================================
+ */
 const fs = require('fs');
 const path = require('path');
 const { requestJson } = require('../shared/requestJson');
 
+// Key dùng khi đọc/ghi catalog từ KV store (fallback cũ).
 const CATALOG_KEY = 'products:catalog';
 const DEFAULT_SUPABASE_TABLE = 'products';
+
+// Thông tin kết nối Supabase được hardcode và đọc từ env.
+// Hardcode ưu tiên hơn env để đảm bảo hoạt động trên Vercel.
 const HARDCODED_SUPABASE_URL = 'https://ykissyxxmgenjtfajcsb.supabase.co';
 const HARDCODED_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlraXNzeXh4bWdlbmp0ZmFqY3NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDMxNjEsImV4cCI6MjA5MTkxOTE2MX0.AkvUDyaWP4riyLQtmUjSQSAdGTJI8g2UfrHuVL4VgQA';
+// Service role key có quyền cao hơn anon key, dùng cho write operations.
 const HARDCODED_SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlraXNzeXh4bWdlbmp0ZmFqY3NiIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjM0MzE2MSwiZXhwIjoyMDkxOTE5MTYxfQ.tPWf0dMtMJYbkdUU_nr5slGExlJSxceQYooGvAe__EI';
 const HARDCODED_PRODUCTS_TABLE = 'products';
 

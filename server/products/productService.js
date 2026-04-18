@@ -1,5 +1,18 @@
+/**
+ * ============================================================
+ * PRODUCT SERVICE - Lớp nghiệp vụ (Business Logic Layer)
+ * ============================================================
+ * Chịu trách nhiệm:
+ *   - Validate dữ liệu đầu vào (tên, giá, danh mục, admin key)
+ *   - Chuẩn hoá text tìm kiếm (bỏ dấu tiếng Việt)
+ *   - Gọi repository để thực thi thao tác DB
+ *   - Không chứa logic truy cập DB trực tiếp (xem productRepository.js)
+ * ============================================================
+ */
 const { createProductRepository } = require('./productRepository');
 
+// Danh sách tất cả danh mục hợp lệ.
+// Dùng Set để kiểm tra O(1) thay vì Array.includes().
 const VALID_CATEGORIES = new Set([
   'ban_chay',
   'do_uong',
@@ -8,8 +21,10 @@ const VALID_CATEGORIES = new Set([
   'gia_vi',
   'do_gia_dung'
 ]);
+// Ảnh mặc định khi người dùng không cung cấp imageUrl.
 const DEFAULT_PRODUCT_IMAGE = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80';
 const DEFAULT_ADMIN_KEY = '123456';
+// Hardcode admin key để đảm bảo hoạt động khi biến môi trường chưa được set.
 const HARDCODED_ADMIN_KEY = '123456';
 
 // Chuẩn hóa tiếng Việt để tìm kiếm không bị ảnh hưởng bởi dấu.
@@ -29,8 +44,14 @@ function getAdminKey() {
 }
 
 // Tạo lớp business logic để validate dữ liệu sản phẩm trước khi lưu.
+// repository: có thể inject mock khi testing (dependency injection).
 function createProductsService({ repository = createProductRepository() } = {}) {
   return {
+    /**
+     * Lấy danh sách sản phẩm với tuỳ chọn lọc.
+     * @param {string} search - Từ khoá tìm tên sản phẩm (bỏ dấu tiếng Việt)
+     * @param {string} category - Lọc theo danh mục (rỗng = tất cả)
+     */
     // Trả về danh sách sản phẩm sau khi áp dụng lọc theo danh mục và từ khóa.
     async listProducts({ search = '', category = '' } = {}) {
       const result = await repository.listProducts();
